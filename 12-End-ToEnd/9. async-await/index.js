@@ -9,7 +9,7 @@ async function asyncFn() {
     console.log('End');
 }
 
-asyncFn();
+//asyncFn();
 
 async function divideFn(num1, num2) {
     try {
@@ -36,4 +36,10 @@ async function asyncDivideFn() {
 }
 
 
-asyncDivideFn();
+//asyncDivideFn();
+
+console.log("A");
+
+setTimeout(() => console.log("B"), 0);
+
+console.log("C");
