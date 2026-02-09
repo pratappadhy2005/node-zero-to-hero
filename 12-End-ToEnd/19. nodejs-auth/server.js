@@ -1,12 +1,12 @@
 const dotenv = require('dotenv');
-dotenv.config();
-
 const express = require('express');
 const connectDB = require('./database/db');
 const authRoute = require('./routes/auth-route');
 const homeRoute = require('./routes/home-routes');
 const adminRoute = require('./routes/admin-routes');
 const authMiddleware = require('./middleware/auth-middleware');
+
+dotenv.config();
 
 const app = express();
 

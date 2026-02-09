@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const isAdmin = require('../middleware/admin-middleware');
 
-router.get('/welcome', (req, res) => {
-    if (req.userInfo.role !== "admin") {
-        return res.status(403).json({ message: "Access denied. Admin role required." });
-    }
+router.get('/welcome', isAdmin, (req, res) => {
     res.status(200).json({
         message: "Admin Page",
         user: {
