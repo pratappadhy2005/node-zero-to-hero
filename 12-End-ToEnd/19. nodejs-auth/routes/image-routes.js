@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post("/upload", authMiddleware, adminMiddleware, uploadMiddleware.single("image"), uploadImageController);
 
-router.get("/", authMiddleware, adminMiddleware, (req, res) => {
+router.get("/get", authMiddleware, adminMiddleware, (req, res) => {
     // get all images uploaded by the user
     Image.find({ uploadedBy: req.userInfo.userId })
         .then((images) => {
