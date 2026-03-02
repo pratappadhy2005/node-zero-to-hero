@@ -1,14 +1,14 @@
-console.log("start operation");
-
 function asyncTask(cb) {
     console.log("Operation is running");
     setTimeout(() => {
-        cb()
+        cb(null, "Pratap")
     }, 2000);
 }
 
-asyncTask(() => {
-    console.log(name)
+asyncTask((err, data) => {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(data)
+    }
 })
-const name = "Pratap"
-console.log("end operation");
