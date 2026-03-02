@@ -5,10 +5,19 @@ function asyncTask(cb) {
     }, 2000);
 }
 
-asyncTask((err, data) => {
-    if (err) {
-        console.log(err)
-    } else {
-        console.log(data)
-    }
+function makeAPICall() {
+    setTimeout(() => {
+        console.log("This is a async task execution")
+    }, 0);
+}
+
+makeAPICall(() => {
+    makeAPICall(() => {
+        asyncTask(() => {
+            console.log("Async task is done")
+            asyncTask(() => {
+                console.log("Another Async task is done")
+            })
+        })
+    })
 })
