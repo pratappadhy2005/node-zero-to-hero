@@ -1,71 +1,54 @@
-console.log('Hello NodeJS from Type Script!')
+import express from 'express'
+import type { Express, Request, Response } from 'express'
+import { User, IUser } from './models/User'
 
-//basic types
-let isDone: boolean = true
+const app: Express = express()
+const port: number = 3000
 
-let count: number = 10
 
-let list: number[] = [1, 2, 3]
+app.use(express.static('public'))
+app.use(express.json())
 
-let products: string[] = ['Apple', 'Orange', 'Banana']
-
-let random: any = 'Hello World'
-
-let xyz: undefined = undefined
-
-let yz: null = null
-
-enum Color {
-  Red,
-  Green,
-  Blue,
+// middleware  -> add start time to request
+interface CustomRequest extends Request {
+  startTime?: number
 }
 
-let d: Color = Color.Green
+app.use((req: CustomRequest, res: Response, next: () => void) => {
+  req.startTime = Date.now()
+  next()
+})
 
-//tuple
-let abc: [string, number] = ['Pratap', 100]
-
-// interfaces , types
-interface User {
-  name: string
-  age: number
-  email?: string
-  id: number
+// post route
+interface User{
+  name: string,
+  email: string
 }
 
-const user: User = {
-  name: 'Pratap',
-  age: 30,
-  id: 100,
-}
+app.post('/user', (req: Request<{}, {}, IUser>, res: Response) => {
+  const user: IUser = req.body
+  res.send(`Hello NodeJS from Type Script! User ${user.name} with email ${user.email}`)
+})
 
-//type
-type UserType = {
-  name: string
-  age: number
-  email?: string
-  id: number
-}
+app.get('/users/:id', (req: Request<{id: string}>, res: Response) => {
+  const id: string = req.params.id
+  res.send(`Hello NodeJS from Type Script! User ${id}`)
+})
 
-const userType: UserType = {
-  name: 'Pratap',
-  age: 30,
-  id: 100,
-}
+app.get('/', (req : Request, res : Response) => {
+  res.send('Hello NodeJS from Type Script!')
+})
 
-//Functions with type annotation
-function add(a: number, b: number): number {
-  return a + b
-}
 
-//Arrow functions
-const multiple = (a: number, b: number): number => {
-  return a * b
-}
+app.get('/users', async (req: Request, res: Response) => {
+  try {
+    const users: IUser[] = await User.find()
+    res.send(users)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
 
-const greet = (name: string, greet?: string): string => {
-  return `Hello ${name}, ${greet || 'Welcome'}`
-} 
-
-console.log(greet('Pratap', 'Good morning'))
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`)
+})
