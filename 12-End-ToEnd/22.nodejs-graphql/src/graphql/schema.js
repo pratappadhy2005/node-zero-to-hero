@@ -13,6 +13,12 @@ const typeDefs = gql`
         products: [Product!]!,
         product(id: ID!): Product!,
     }   
+
+    type Mutation {
+        createProduct(title: String!, price: Float!, category: String!, inStock: Boolean!): Product!
+        deleteProduct(id: ID!): Boolean!
+        updateProduct(id: ID!, title: String, price: Float, category: String, inStock: Boolean): Product!
+    }
 `
 
 module.exports = typeDefs

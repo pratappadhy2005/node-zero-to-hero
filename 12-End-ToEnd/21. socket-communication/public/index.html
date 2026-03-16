@@ -19,6 +19,14 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js">
         const socket = io();
+
+        const chat =document.getElementById('chat-container');
+        const usersList = document.getElementById('users');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+
+        const userName = prompt('Please enter your name:');
+        socket.emit('user-joined', userName);
     </script>
 </body>
 </html>
