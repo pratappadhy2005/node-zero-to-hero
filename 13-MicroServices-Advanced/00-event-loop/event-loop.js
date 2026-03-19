@@ -30,10 +30,12 @@ fs.readFile(__filename, () => {
     console.log('7. fs.readFile callback (I/O callback)');
 });
 
+fs.writeFile(__filename, 'test', () => {
+    console.log('8. fs.writeFile callback (I/O callback)');
+});
+
 crypto.pbkdf2('password', 'salt', 100000, 512, 'sha512', () => {
     console.log('8. crypto.pbkdf2 callback (CPU intensive task)');
 });
-
-
 
 console.log('9. script end');
