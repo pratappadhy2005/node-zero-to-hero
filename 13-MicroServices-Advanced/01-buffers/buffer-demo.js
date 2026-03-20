@@ -12,3 +12,5 @@ console.log(buffFromStream);
 
 const bufferFromArray = Buffer.from([1, 2, 3]);
 console.log(bufferFromArray);
+
+console.log(bufferFromArray.toString());
