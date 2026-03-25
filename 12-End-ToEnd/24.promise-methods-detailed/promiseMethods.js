@@ -16,6 +16,22 @@ const promise3 = new Promise((resolve, reject) => {
     }, 2000);
 })
 
+//All promises settled
 Promise.allSettled([promise1, promise2, promise3])
-    .then(results => console.log(results))
+    .then(results => console.log('All promises settled:', results))
+    .catch(err => console.log('Promise allSettled rejected:', err));
+
+//First rejected promise
+Promise.all([promise1, promise2, promise3])
+    .then(results => console.log('Promise all resolved:', results))
     .catch(err => console.log('Promise all rejected:', err));
+
+//First resolved promise
+Promise.any([promise1, promise2, promise3])
+    .then(results => console.log('First resolved promise:', results))
+    .catch(err => console.log('Promise any rejected:', err));
+
+//First fulfilled (rejected or resolved) promise
+Promise.race([promise1, promise2, promise3])
+    .then(results => console.log('First fulfilled promise:', results))
+    .catch(err => console.log('Promise race rejected:', err));  
