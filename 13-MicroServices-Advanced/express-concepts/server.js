@@ -1,11 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const { corsOptions } = require('./config/corsConfig');
+const corsOptions = require('./config/corsConfig');
 const cors = require('cors');
-const { asyncErrorHandler, globalErrorHandler } = require('./middleware/errorHandler');
+const { globalErrorHandler } = require('./middleware/errorHandler');
 const { addTimeStamp, requestLogger } = require('./middleware/customMiddleware');
-const { urlVersioning, headerUrlVersioning, contentTypeVersioning, queryVersioning } = require('./middleware/apiVersioning');
-
+const { urlVersioning } = require('./middleware/apiVersioning');
+const { createBasicRateLimit } = require('./middleware/rateLimiting');
+const itemRoutes = require('./routes/item-routes');
 
 
 const app = express();
@@ -22,24 +23,17 @@ app.use(cors(corsOptions));
 // express json middleware
 app.use(express.json());
 
-// global error handler middleware
-app.use(globalErrorHandler);
-
-// async error handler middleware
-app.use(asyncErrorHandler);
-
 // url versioning middleware
 app.use(urlVersioning('v1'));
-// header url versioning middleware
-app.use(headerUrlVersioning('v1'));
-// content type versioning middleware
-app.use(contentTypeVersioning('application/v1'));
-// query versioning middleware
-app.use(queryVersioning('v1'));
-// response versioning middleware
-app.use(responseVersioning('v1'));
 
+// rate limiting middleware
+app.use(createBasicRateLimit(100, 60 * 1000));
 
+// item routes
+app.use("/api/v1/items", itemRoutes);
+
+// global error handler middleware
+app.use(globalErrorHandler);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
