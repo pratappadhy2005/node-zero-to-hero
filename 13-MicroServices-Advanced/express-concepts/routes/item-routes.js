@@ -1,7 +1,5 @@
 const express = require('express');
-const { asyncErrorHandler } = require('../middleware/errorHandler');
-
-
+const { asyncErrorHandler, APIError } = require('../middleware/errorHandler');
 
 const router = express.Router();
 
@@ -35,6 +33,15 @@ const items = [
 
 router.get('/', asyncErrorHandler(async (req, res) => {
     res.json(items);
+}));
+
+router.post('/', asyncErrorHandler(async (req, res) => {
+    if (!req.body.name || !req.body.price) {
+        throw new APIError('name and price are required', 400);
+    }
+    req.body.id = items.length + 1;
+    items.push(req.body);
+    res.json(req.body);
 }));
 
 module.exports = router;

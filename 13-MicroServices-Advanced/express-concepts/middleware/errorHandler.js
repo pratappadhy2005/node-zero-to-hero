@@ -45,5 +45,6 @@ const globalErrorHandler = (err, req, res, next) => {
 
 module.exports = {
     asyncErrorHandler,
-    globalErrorHandler
+    globalErrorHandler,
+    APIError
 }

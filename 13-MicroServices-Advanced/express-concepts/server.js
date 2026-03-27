@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(urlVersioning('v1'));
 
 // rate limiting middleware
-app.use(createBasicRateLimit(100, 60 * 1000));
+app.use(createBasicRateLimit(2, 15 * 60 * 1000));
 
 // item routes
 app.use("/api/v1/items", itemRoutes);
