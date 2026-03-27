@@ -4,6 +4,8 @@ const { corsOptions } = require('./config/corsConfig');
 const cors = require('cors');
 const { asyncErrorHandler, globalErrorHandler } = require('./middleware/errorHandler');
 const { addTimeStamp, requestLogger } = require('./middleware/customMiddleware');
+const { urlVersioning, headerUrlVersioning, contentTypeVersioning, queryVersioning } = require('./middleware/apiVersioning');
+
 
 
 const app = express();
@@ -25,6 +27,18 @@ app.use(globalErrorHandler);
 
 // async error handler middleware
 app.use(asyncErrorHandler);
+
+// url versioning middleware
+app.use(urlVersioning('v1'));
+// header url versioning middleware
+app.use(headerUrlVersioning('v1'));
+// content type versioning middleware
+app.use(contentTypeVersioning('application/v1'));
+// query versioning middleware
+app.use(queryVersioning('v1'));
+// response versioning middleware
+app.use(responseVersioning('v1'));
+
 
 
 app.listen(port, () => {
