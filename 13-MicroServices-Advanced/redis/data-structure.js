@@ -48,6 +48,20 @@ async function dataStructure() {
         const updatedList = await client.lRange("notes", 0, -1);
         console.log("Updated List:", updatedList);
 
+        // sets -> SADD, SMEMBERS, SREM, SCARD
+        await client.sAdd("supernotes", ["Note 4", "Note 5", "Note 6"]);
+        console.log("User Name Set Added");
+        const setList = await client.sMembers("supernotes");
+        console.log("User Set:", setList);
+
+        // Remove an element from the set
+        await client.sRem("supernotes", "Note 5");
+        console.log("Note 5 Removed");
+
+        // Get the updated set after removing
+        const updatedSet = await client.sCard("supernotes");
+        console.log("Updated Set:", updatedSet);
+
     } catch (err) {
         console.error('Error connecting to Redis:', err);
     } finally {
