@@ -59,7 +59,7 @@ async function dataStructure() {
         console.log("Note 5 Removed");
 
         // Get the updated set after removing
-        const updatedSet = await client.sCard("supernotes");
+        const updatedSet = await client.sMembers("supernotes");
         console.log("Updated Set:", updatedSet);
 
     } catch (err) {
