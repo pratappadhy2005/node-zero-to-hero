@@ -7,7 +7,8 @@ const validateRegisterUser = (data) => {
         password: joi.string().min(8).max(30).required(),
         firstName: joi.string().min(3).max(30).required(),
         lastName: joi.string().min(3).max(30).required(),
-    });
+        role: joi.string().valid('user').optional(),
+    }).options({ allowUnknown: false, stripUnknown: true });
     return schema.validate(data);
 };
 

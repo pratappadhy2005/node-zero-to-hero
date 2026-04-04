@@ -1,5 +1,3 @@
-const RefreshToken = require('../models/RefreshToken');
-
 //Import the User model to use for user registration
 const User = require('../models/User');
 const logger = require('../utils/logger');
@@ -11,13 +9,9 @@ const registerUser = async (req, res) => {
     logger.info('registerUser controller called');
     try {
         //validate the schema
-        const { error } = validateRegisterUser(req.body);
+        const { value, error } = validateRegisterUser(req.body);
         if (error) {
-            res.status(400).json({
-                message: error.details[0].message,
-                success: false,
-            });
-            logger.warn('Validation error:', error.details[0].message);
+            logger.warn(`Validation error: ${error.details[0].message}`);
             return res.status(400).json({
                 message: error.details[0].message,
                 success: false,
@@ -25,21 +19,21 @@ const registerUser = async (req, res) => {
         }
 
         //create the user
-        const { username, email, firstName, lastName } = req.body;
+        const { username, email, firstName, lastName, password } = value;
 
         let user = await User.findOne({ $or: [{ username }, { email }] });
         if (user) {
             logger.warn('Username or email already exists');
-            res.status(400).json({
+            return res.status(400).json({
                 message: 'Username or email already exists',
                 success: false,
             });
         }
 
-        user = await User.save({
+        user = await User.create({
             username,
             email,
-            password: req.body.password,
+            password,
             firstName,
             lastName,
         });
@@ -55,7 +49,7 @@ const registerUser = async (req, res) => {
             refreshToken,
         });
     } catch (error) {
-        logger.error('User registerUser error:', error.message);
+        logger.error(`User registerUser error: ${error.message}`);
         res.status(400).json({
             message: error.message,
             success: false,
@@ -71,4 +65,4 @@ const registerUser = async (req, res) => {
 
 module.exports = {
     registerUser,
-}
+};
