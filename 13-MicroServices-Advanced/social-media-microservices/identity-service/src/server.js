@@ -1,14 +1,15 @@
 const express = require('express');
 const identityServiceRouter = require('./routes/identity-service');
-const logger = require('../utils/logger');
+const logger = require('./utils/logger');
 require('dotenv').config();
-const { dbConnect } = require('./configuration/dbConnect');
-const { errorHandler } = require('./middleware/errorHandler');
+const dbConnect = require('./configuration/dbConnect');
+const errorHandler = require('./middleware/errorHandler');
 const helmet = require('helmet');
 const cors = require('cors');
-const { RateLImiterRedis } = require('express-rate-limit');
+const { RateLimiterRedis } = require('rate-limiter-flexible');
 const Redis = require('ioredis');
-
+const rateLimit = require('express-rate-limit');
+const { RedisStore } = require('rate-limit-redis');
 const app = express();
 
 //connect to the database
@@ -16,9 +17,6 @@ dbConnect();
 
 //connect to the redis
 const redisClient = new Redis(process.env.REDIS_URL);
-
-//use the rate limiter
-app.use(rateLimiter);
 
 //use the middleware
 app.use(express.json());
@@ -32,7 +30,7 @@ app.use((req, res, next) => {
 });
 
 //DDOS Attack Protection
-const rateLimiter = new RateLImiterRedis({
+const rateLimiter = new RateLimiterRedis({
     storeClient: redisClient,
     keyPrefix: 'middleware',
     points: 10,
@@ -51,12 +49,38 @@ app.use((req, res, next) => {
         });
 });
 
+// IP based rate limiting for sensitive routes
+const sensitiveEndpointsLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+        logger.warn(`Sensitive endpoints too many requests from ${req.ip}`);
+        res.status(429).json({
+            message: 'Too many requests from this IP',
+            success: false,
+        });
+    },
+    store: new RedisStore({
+        sendCommand: (...args) => redisClient.call(...args),
+    }),
+});
+
 //use the router    
-app.use('/api/identity', identityServiceRouter);
+app.use('/api/auth/register', sensitiveEndpointsLimiter);
+
+// Routes
+app.use('/api/auth', identityServiceRouter);
 
 //use the error handler
 app.use(errorHandler);
 
 app.listen(process.env.PORT || 3000, () => {
-    logger.info('Identity Service is running on port 3000');
+    logger.info(`Identity Service is running on port ${process.env.PORT || 3000}`);
+});
+
+//unhandled promise rejection
+process.on('unhandledRejection', (reason, p) => {
+    logger.error('Unhandled Promise Rejection at:', p, 'reason:', reason);
 });
