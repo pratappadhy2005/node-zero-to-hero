@@ -12,6 +12,15 @@ const validateRegisterUser = (data) => {
     return schema.validate(data);
 };
 
+const validateLoginUser = (data) => {
+    const schema = joi.object({
+        username: joi.string().min(3).max(30).required(),
+        password: joi.string().min(8).max(30).required(),
+    }).options({ allowUnknown: false, stripUnknown: true });
+    return schema.validate(data);
+};
+
 module.exports = {
     validateRegisterUser,
+    validateLoginUser,
 };

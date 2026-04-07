@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 // IP based rate limiting for sensitive routes
 const sensitiveEndpointsLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 10,
+    max: 50,
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req, res) => {
