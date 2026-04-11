@@ -20,7 +20,15 @@ const validateLoginUser = (data) => {
     return schema.validate(data);
 };
 
+const validateRefreshToken = (data) => {
+    const schema = joi.object({
+        refreshToken: joi.string().required(),
+    }).options({ allowUnknown: false, stripUnknown: true });
+    return schema.validate(data);
+};
+
 module.exports = {
     validateRegisterUser,
     validateLoginUser,
+    validateRefreshToken,
 };

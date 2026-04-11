@@ -23,6 +23,10 @@ const refreshTokenSchema = new mongoose.Schema({
 
 refreshTokenSchema.index({ expiresAt: 1 }, { expiresAfterSeconds: 60 * 5 });
 
+refreshTokenSchema.methods.validateToken = async function (token) {
+    return this.token === token;
+};
+
 const RefreshToken = mongoose.model('RefreshToken', refreshTokenSchema);
 
 module.exports = RefreshToken;
