@@ -2,7 +2,7 @@
 const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
 const logger = require('../utils/logger');
-const { validateRegisterUser, validateLoginUser, validateRefreshToken } = require('../utils/validation');
+const { validateRegisterUser, validateLoginUser, validateRefreshToken, validateLogoutUser } = require('../utils/validation');
 const { generateToken } = require('../utils/generateToken');
 
 //user registration
@@ -179,9 +179,49 @@ const refreshTokenUser = async (req, res) => {
 };
 
 //logout
+const logoutUser = async (req, res) => {
+    logger.info('logoutUser controller called');
+    try {
+        //validate the schema
+        const { value, error } = validateLogoutUser(req.body);
+        if (error) {
+            logger.warn(`Validation error: ${error.details[0].message}`);
+            return res.status(400).json({
+                message: error.details[0].message,
+                success: false,
+            });
+        }
+        const { refreshToken } = value;
+
+        //find the token
+        let token = await RefreshToken.findOne({ token: refreshToken });
+        if (!token || token.expiresAt < new Date()) {
+            logger.warn('Refresh token not found or expired');
+            return res.status(400).json({
+                message: 'Refresh token not found or expired',
+                success: false,
+            });
+        }
+
+        //delete the token
+        await RefreshToken.deleteOne({ _id: token._id });
+
+        res.status(200).json({
+            success: true,
+            message: 'User logged out successfully',
+        });
+    } catch (error) {
+        logger.error(`User logoutUser error: ${error.message}`);
+        res.status(400).json({
+            message: error.message,
+            success: false,
+        });
+    }
+};
 
 module.exports = {
     registerUser,
     loginUser,
     refreshTokenUser,
+    logoutUser,
 };
