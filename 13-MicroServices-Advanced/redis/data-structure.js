@@ -62,6 +62,24 @@ async function dataStructure() {
         const updatedSet = await client.sMembers("supernotes");
         console.log("Updated Set:", updatedSet);
 
+        //sorted sets -> ZADD, ZRANGEBYR, ZREM, ZCARD
+        await client.zAdd("cart", [
+            { score: 100, member: "Note 4" },
+            { score: 200, member: "Note 5" },
+            { score: 300, member: "Note 6" },
+        ]);
+        console.log("User Name Sorted Set Added");
+        const sortedSetList = await client.zRangeByRank("cart", 0, -1);
+        console.log("User Sorted Set:", sortedSetList);
+
+        // Remove an element from the sorted set
+        await client.zRem("cart", "Note 5");
+        console.log("Note 5 Removed");
+
+        // Get the updated sorted set after removing
+        const updatedSortedSet = await client.zRangeByRank("cart", 0, -1);
+        console.log("Updated Sorted Set:", updatedSortedSet);
+
     } catch (err) {
         console.error('Error connecting to Redis:', err);
     } finally {
