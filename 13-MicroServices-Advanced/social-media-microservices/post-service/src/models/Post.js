@@ -14,7 +14,7 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    mediaUrl: [{
+    mediaIds: [{
         type: String,
         required: false,
     }],
