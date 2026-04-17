@@ -15,7 +15,7 @@ A simple and scalable Node.js application for [insert purpose, e.g., building RE
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack MERN
 
 - Node.js
 - Express.js
