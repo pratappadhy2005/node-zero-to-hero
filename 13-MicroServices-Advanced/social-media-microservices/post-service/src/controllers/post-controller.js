@@ -1,9 +1,17 @@
 const logger = require('../utils/logger');
 const Post = require('../models/Post');
-
+const { validatePost } = require('../utils/validation');
 
 const createPost = async (req, res) => {
     logger.info('createPost request received:', req.body);
+
+    const { error } = validatePost(req.body);
+    if (error) {
+        logger.error('Invalid post data:', error.details[0].message);
+        res.status(400).json({ error: error.details[0].message });
+        return;
+    }
+
     try {
         const { title, content, mediaIds } = req.body;
         const post = await Post.create({
