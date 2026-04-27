@@ -2,6 +2,12 @@ const logger = require('../utils/logger');
 const Post = require('../models/Post');
 const { validatePost } = require('../utils/validation');
 
+async function invalidatePostCache(req, res) {
+    const cacheKey = `posts:${req.query.page || 1}:${req.query.limit || 10}`;
+    await req.redisClient.del(cacheKey);
+    logger.info(`Post cache invalidated for page ${req.query.page || 1} and limit ${req.query.limit || 10}`);
+}
+
 const createPost = async (req, res) => {
     logger.info('createPost request received:', req.body);
 
@@ -21,6 +27,7 @@ const createPost = async (req, res) => {
             mediaIds: mediaIds || [],
         });
         logger.info('Post created successfully:', post);
+        await invalidatePostCache(req, res);
         res.status(201).json(post);
     } catch (error) {
         logger.error('Error creating post:', error);
@@ -68,6 +75,7 @@ const getAllPosts = async (req, res) => {
 };
 
 const getPostById = async (req, res) => {
+    //get id from path params
     logger.info('getPostById request received:', req.params.id);
     try {
         const post = await Post.findById(req.params.id);
@@ -77,6 +85,7 @@ const getPostById = async (req, res) => {
             return;
         }
         logger.info('Post retrieved successfully:', post);
+        await invalidatePostCache(req, res);
         res.status(200).json(post);
     } catch (error) {
         logger.error('Error retrieving post:', error);
@@ -89,6 +98,7 @@ const deletePostById = async (req, res) => {
     try {
         await Post.findByIdAndDelete(req.params.id);
         logger.info('Post deleted successfully:', req.params.id);
+        await invalidatePostCache(req, res);
         res.status(204).json({ message: 'Post deleted successfully' });
     } catch (error) {
         logger.error('Error deleting post:', error);
