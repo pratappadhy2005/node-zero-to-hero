@@ -32,9 +32,35 @@ const createPost = async (req, res) => {
 const getAllPosts = async (req, res) => {
     logger.info('getAllPosts request received:', req.query);
     try {
-        const posts = await Post.find(req.query).sort({ createdAt: -1 });
+
+        const pageNumber = parseInt(req.query.page || 1);
+        const limit = parseInt(req.query.limit || 10);
+        const startIndex = (pageNumber - 1) * limit;
+
+        const cacheKey = `posts:${pageNumber}:${limit}`;
+
+        let cachedPosts = await req.redisClient.get(cacheKey);
+        const totalPosts = await Post.countDocuments(req.query);
+
+        if (cachedPosts) {
+            logger.info('Posts retrieved from cache:', cachedPosts);
+            res.status(200).json(JSON.parse(cachedPosts));
+            return;
+        }
+
+        const posts = await Post.find(req.query).sort({ createdAt: -1 }).skip(startIndex).limit(limit);
+        await req.redisClient.set(cacheKey, JSON.stringify(posts), 'EX', 60 * 5);
         logger.info('Posts retrieved successfully:', posts);
-        res.status(200).json(posts);
+
+        result = {
+            posts,
+            totalPosts,
+            currentPage: pageNumber,
+            limit,
+            totalPages: Math.ceil(totalPosts / limit),
+        };
+
+        res.status(200).json(result);
     } catch (error) {
         logger.error('Error retrieving posts:', error);
         res.status(500).json({ error: 'Internal server error' });
