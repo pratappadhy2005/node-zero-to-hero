@@ -26,7 +26,7 @@ A simple and scalable Node.js application for [insert purpose, e.g., building RE
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started Quickly
 
 ### Prerequisites
 
